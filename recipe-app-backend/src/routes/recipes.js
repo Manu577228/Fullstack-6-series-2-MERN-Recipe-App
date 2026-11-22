@@ -23,7 +23,7 @@ import express from "express";
 import mongoose from "mongoose";
 import { RecipesModel } from "../models/Recipes.js";
 import { UserModel } from "../models/Users.js";
-import { verifyToken } from "./user.js";
+import { verifyToken } from "./Users.js";
 import { cacheGet, cacheSet, cacheDel } from "../config/redis.js";
 
 const router = express.Router();

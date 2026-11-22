@@ -26,7 +26,7 @@ import cors from "cors";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import mongoose from "mongoose";
-import { userRouter } from "./routes/user.js";
+import { userRouter } from "./routes/Users.js";
 import { recipesRouter } from "./routes/recipes.js";
 
 /* ------------------------------------------------------------------
