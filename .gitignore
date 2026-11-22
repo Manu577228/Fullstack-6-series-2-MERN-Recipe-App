@@ -3,26 +3,23 @@ node_modules/
 .pnp
 .pnp.js
 
-# Tests and build
+# Tests and build output
 coverage/
 build/
 dist/
 
-# Secrets and local environment files (all project folders)
+# Secrets and local environment files (matches in every folder,
+# so both the frontend and the backend are covered)
 .env
 .env.*
 !.env.example
 
-# Misc
-.DS_Store
-<<<<<<< HEAD
-=======
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
->>>>>>> 309c41b (Updated env)
+# Logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# OS and editor files
+.DS_Store
+.vscode/
+.idea/
