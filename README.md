@@ -16,8 +16,9 @@
 ![JWT](https://img.shields.io/badge/JWT-000000?style=flat-square&logo=jsonwebtokens&logoColor=white)
 ![Vercel](https://img.shields.io/badge/Vercel-000000?style=flat-square&logo=vercel&logoColor=white)
 ![Render](https://img.shields.io/badge/Render-46E3B7?style=flat-square&logo=render&logoColor=black)
+![k6](https://img.shields.io/badge/k6_Load_Tested-7D64FF?style=flat-square&logo=k6&logoColor=white)
 
-[**Try it live**](https://mern-recipe-info-manu-bharadwaj.vercel.app/) · [**API health**](https://manu-recipe-api.onrender.com/health) · [**Architecture**](#️-architecture) · [**API reference**](#-api-reference)
+[**Try it live**](https://mern-recipe-info-manu-bharadwaj.vercel.app/) · [**API health**](https://manu-recipe-api.onrender.com/health) · [**Architecture**](#️-architecture) · [**API reference**](#-api-reference) · [**Load test results**](#-load-test-with-k6)
 
 </div>
 
@@ -57,6 +58,7 @@ It goes well beyond basic CRUD:
 - ✅ **Server-side validation** on every write
 - 🚦 **Rate limiting**, **Helmet** security headers and request size limits
 - ⚡ **Redis cache-aside caching** with TTLs, targeted invalidation, and graceful fallback to MongoDB
+- 📈 **Load tested with k6**: 20 concurrent users, 100% checks passed, p95 API latency of 390 ms and a 98% Redis cache hit rate on free-tier hosting
 - ☁️ **Four independent managed services**: Vercel (UI), Render (API), MongoDB Atlas (data), Redis Cloud (cache)
 
 ---
@@ -84,6 +86,7 @@ It goes well beyond basic CRUD:
 | ⚡ | **Redis caching** | Cache-aside reads for lists and single recipes, with TTLs and invalidation on every change |
 | 🛡️ | **API protections** | Helmet, CORS allow-list, auth rate limiting, 100 KB body limit, strict validation |
 | 📱 | **Responsive UI** | React Router with protected and guest-only routes, mobile menu, loading, empty and error states |
+| 📈 | **Load tested** | k6 script covering the frontend, health check and authenticated, cached API reads, with pass/fail thresholds |
 | ☁️ | **Production-ready** | Independently deployed frontend and backend, health check endpoint, all secrets in environment variables |
 
 ---
@@ -228,6 +231,7 @@ erDiagram
 | **Connect to MongoDB before listening** | The API never accepts traffic it can't serve. |
 | **Whitelisted fields on every write** | Only known recipe fields can ever be stored (no mass assignment). |
 | **`$addToSet` for saving recipes** | Saving twice can never create duplicates. |
+| **Load test logs in once, in `setup()`** | `/auth` is rate limited, so logging in on every iteration would measure the limiter instead of the app. |
 
 ---
 
@@ -512,21 +516,39 @@ curl -s -D - -o /dev/null \
 
 Run it twice. The first call returns `x-cache: MISS`, the second `x-cache: HIT`. A miss again is expected after the entry expires or a recipe changes.
 
-### Load test with k6
+### 📈 Load test with k6
 
-The repo includes a read-only [k6](https://k6.io) script that ramps to 10 virtual users and asserts under 1% errors and a p95 under 800 ms.
+The repo includes a read-only [k6](https://k6.io) script, `k6-loadtest.js`, that exercises the deployed stack end to end: the Vercel frontend, the API health check, and the JWT-authenticated `GET /recipes` endpoint backed by Redis. It signs in once in `setup()`, because `/auth` is rate limited and a test that logged in on every iteration would only measure the limiter. It also reports the Redis cache hit rate from the `X-Cache` response header.
 
 ```bash
 brew install k6
 
-# against a local API
-k6 run -e BASE_URL=http://localhost:3001 k6-loadtest.js
-
 # against production (keep the load gentle on free tiers)
-k6 run -e BASE_URL=https://manu-recipe-api.onrender.com k6-loadtest.js
+k6 run -e USERNAME=your_user -e PASSWORD='your_password' k6-loadtest.js
+
+# against a local API
+k6 run -e API_URL=http://localhost:3001 -e USERNAME=your_user -e PASSWORD='your_password' k6-loadtest.js
 ```
 
-It signs in once, because `/auth` is rate limited, so a test that logged in on every iteration would only measure the limiter.
+Use an account you registered on the app. The script registers it if it doesn't exist yet. Override targets with `-e WEB_URL=...` and `-e API_URL=...`.
+
+**Load profile:** ramp to 10 virtual users, hold for a minute, push to 20, then ramp down (2.5 minutes in total).
+
+**Results against production (free-tier hosting):**
+
+| Metric | Result | Threshold |
+|---|---|---|
+| Checks passed | 100% (1,742 of 1,742) | > 99% |
+| Request failure rate | 0.09% (1 of 1,047) | < 1% |
+| `GET /recipes` (JWT + Redis), p95 | 390 ms | < 800 ms |
+| `GET /recipes`, p99 | 580 ms | < 1500 ms |
+| Frontend (Vercel), p95 | 113 ms | < 800 ms |
+| API `/health`, p95 | 114 ms | < 800 ms |
+| Redis cache hit rate | 98.3% (342 of 348 reads) | > 80% |
+
+> The single failed request is the `register` call in `setup()` returning an error because the test account already exists. It is expected and does not affect any check.
+
+Results will vary with your network location and with Render's free-tier cold starts.
 
 ---
 
@@ -546,6 +568,8 @@ It signs in once, because `/auth` is rate limited, so a test that logged in on e
 | First request takes about 50 seconds | Render's free tier is waking from sleep. This is normal. |
 | Logged out unexpectedly | The 7-day token expired. Log in again. |
 | `x-cache` header always `MISS` | `REDIS_URL` isn't set or Redis is unreachable. Check the server logs for `Redis connected`. |
+| k6 says `Login failed` | Wrong `USERNAME` or `PASSWORD`, or the `/auth` rate limit was hit. Wait a few minutes and retry. |
+| k6 says `moduleSpecifier ... couldn't be found` | Run k6 from the folder that contains `k6-loadtest.js` (the repo root). |
 
 </details>
 
@@ -559,6 +583,7 @@ It signs in once, because `/auth` is rate limited, so a test that logged in on e
 - [ ] Image uploads instead of requiring image URLs
 - [ ] Stronger session management with refresh tokens
 - [ ] Observability and deployment health monitoring
+- [ ] Run the k6 test in CI against a staging deployment
 
 ---
 
