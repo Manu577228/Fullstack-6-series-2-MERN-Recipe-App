@@ -1,9 +1,121 @@
-@import url("https://fonts.googleapis.com/css2?family=Inconsolata:wght@200;300;400;500;600;700;800;900&family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+/*
+ ============================================================================================
 
-* {
-  font-family: "Montserrat", sans-serif;
-}
+ #   #   ###   #   #  #   #
+ ## ##  #   #  ##  #  #   #
+ # # #  #####  # # #  #   #
+ #   #  #   #  #  ##  #   #
+ #   #  #   #  #   #   ### 
+
+ ####   #   #   ###   ####    ###   ####   #   #   ###     ###
+ #   #  #   #  #   #  #   #  #   #  #   #  #   #  #   #     # 
+ ####   #####  #####  ####   #####  #   #  # # #  #####     # 
+ #   #  #   #  #   #  #  #   #   #  #   #  ## ##  #   #  #  # 
+ ####   #   #  #   #  #   #  #   #  ####   #   #  #   #   ##  
+
+ --------------------------------------------------------------------------------------------
+  YouTube : @code-with-Bharadwaj
+  GitHub  : github.com/Manu577228
+ ============================================================================================
+*/
+
+/* Fonts (an @import must stay above every other rule) */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ------------------------------------------------------------------
+ * Design tokens (same palette used by Navbar, Auth, CreateRecipe, Home)
+ * ------------------------------------------------------------------ */
+:root {
+  --app-bg: #0b0d12;
+  --app-card: #11131a;
+  --app-surface: rgba(255, 255, 255, 0.05);
+  --app-border: rgba(255, 255, 255, 0.09);
+  --app-text: #eceef4;
+  --app-muted: #8b90a0;
+  --app-accent: #4f8cff;
+  --app-accent-hover: #6b9fff;
+
+  /* Change this one line to switch the font everywhere */
+  --app-font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  color-scheme: dark;
+}
+
+/* ------------------------------------------------------------------
+ * Base
+ * ------------------------------------------------------------------ */
+html {
+  scrollbar-gutter: stable;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--app-bg);
+  color: var(--app-text);
+  font-family: var(--app-font);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Form controls inherit the app font instead of the browser default */
+button,
+input,
+textarea,
+select {
+  font-family: inherit;
+}
+
+img {
+  max-width: 100%;
+}
+
+/* ------------------------------------------------------------------
+ * Polish
+ * ------------------------------------------------------------------ */
+::selection {
+  background: rgba(79, 140, 255, 0.35);
+  color: #fff;
+}
+
+:focus-visible {
+  outline: 2px solid var(--app-accent);
+  outline-offset: 2px;
+}
+
+/* Slim dark scrollbars */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  border: 2px solid var(--app-bg);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.28);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    scroll-behavior: auto !important;
+  }
+}
