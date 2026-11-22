@@ -1,4 +1,9 @@
 services:
+  - type: keyvalue
+    name: manu-recipe-cache
+    maxmemoryPolicy: allkeys-lru
+    ipAllowList: []
+
   - type: web
     name: manu-recipe-api
     runtime: node
@@ -15,6 +20,11 @@ services:
         generateValue: true
       - key: CLIENT_ORIGIN
         sync: false
+      - key: REDIS_URL
+        fromService:
+          type: keyvalue
+          name: manu-recipe-cache
+          property: connectionString
 
   - type: web
     name: manu-recipe-app
