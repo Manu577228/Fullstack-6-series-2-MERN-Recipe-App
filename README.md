@@ -94,8 +94,8 @@ It goes well beyond basic CRUD:
 <table>
   <tr>
     <td><img src="Sample-UI-1.PNG" alt="Screenshot 1" width="100%"></td>
-    <td><img src="Sample-UI-2.png" alt="Screenshot 2" width="100%"></td>
-    <td><img src="Sample-UI-3.png" alt="Screenshot 3" width="100%"></td>
+    <td><img src="Sample-UI-2.PNG" alt="Screenshot 2" width="100%"></td>
+    <td><img src="Sample-UI-3.PNG" alt="Screenshot 3" width="100%"></td>
   </tr>
   <tr>
     <td><img src="Sample-UI-4.png" alt="Screenshot 4" width="100%"></td>
