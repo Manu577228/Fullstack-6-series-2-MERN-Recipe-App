@@ -15,6 +15,14 @@ dist/
 
 # Misc
 .DS_Store
+<<<<<<< HEAD
+=======
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+>>>>>>> 309c41b (Updated env)
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
